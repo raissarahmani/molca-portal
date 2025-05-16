@@ -1,6 +1,14 @@
 # Binaries
-[project_name]
 *.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+go.work
+go.work.sum
 
 # Dependencies
 /vendor/
@@ -12,3 +20,13 @@
 # Go specific
 *.gc
 *.o
+
+storage/
+
+# Config files - ignore all except example.local.yaml
+config/**
+!config/example.local.yaml
+
+.env
+
+DS_Store
