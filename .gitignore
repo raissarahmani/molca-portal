@@ -1,0 +1,14 @@
+# Binaries
+[project_name]
+*.exe
+
+# Dependencies
+/vendor/
+
+# IDEs and Editors
+.idea/
+.vscode/
+
+# Go specific
+*.gc
+*.o
