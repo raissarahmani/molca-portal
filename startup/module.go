@@ -5,6 +5,7 @@ import (
 
 	"github.com/molca-id/portal-app-api/arch/mongo"
 	"github.com/molca-id/portal-app-api/arch/network"
+	"github.com/molca-id/portal-app-api/arch/redis"
 	"github.com/molca-id/portal-app-api/config"
 )
 
@@ -14,6 +15,7 @@ type module struct {
 	Context context.Context
 	Env     *config.Env
 	DB      mongo.Database
+	Store   redis.Store
 }
 
 func (m *module) GetInstance() *module {
@@ -28,10 +30,11 @@ func (m *module) RootMiddlewares() []network.RootMiddleware {
 	return []network.RootMiddleware{}
 }
 
-func NewModule(ctx context.Context, env *config.Env, db mongo.Database) Module {
+func NewModule(ctx context.Context, env *config.Env, db mongo.Database, store redis.Store) Module {
 	return &module{
 		Context: ctx,
 		Env:     env,
 		DB:      db,
+		Store:   store,
 	}
 }

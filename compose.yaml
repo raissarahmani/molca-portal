@@ -14,6 +14,17 @@ services:
     command: mongod --bind_ip_all
     volumes:
       - dbdata:/data/db
+  redis:
+    image: redis:7.2.5
+    container_name: redis
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - '6379:6379'
+    command: redis-server --bind localhost --bind 0.0.0.0 --save 20 1 --loglevel warning --requirepass redispassword
+    volumes:
+      - cache:/data/cache
 
 volumes:
   dbdata:
+  cache:

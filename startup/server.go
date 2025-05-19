@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/molca-id/portal-app-api/arch/mongo"
 	"github.com/molca-id/portal-app-api/arch/network"
+	"github.com/molca-id/portal-app-api/arch/redis"
 	"github.com/molca-id/portal-app-api/config"
 )
 
@@ -41,7 +42,17 @@ func create(env *config.Env) (network.Router, Module, Shutdown) {
 		EnsureIndexes(db)
 	}
 
-	module := NewModule(ctx, env, db)
+	redisConfig := redis.Config{
+		Host: env.RedisHost,
+		Port: env.RedisPort,
+		Pwd:  env.RedisPwd,
+		DB:   env.RedisDB,
+	}
+
+	store := redis.NewStore(ctx, &redisConfig)
+	store.Connect()
+
+	module := NewModule(ctx, env, db, store)
 
 	router := network.NewRouter(env.GoMode)
 	router.RegisterValidationParsers(network.CustomTagNameFunc())
@@ -50,6 +61,7 @@ func create(env *config.Env) (network.Router, Module, Shutdown) {
 
 	shutdown := func() {
 		db.Disconnect()
+		store.Disconnect()
 	}
 
 	return router, module, shutdown
