@@ -2,11 +2,12 @@ package mongo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
@@ -94,11 +95,11 @@ func (d *database) Disconnect() {
 	fmt.Println("Disconnected from MongoDB")
 }
 
-func NewObjectID(id string) (primitive.ObjectID, error) {
-	i, err := primitive.ObjectIDFromHex(id)
+func NewObjectID(id string) (bson.ObjectID, error) {
+	i, err := bson.ObjectIDFromHex(id)
 	if err != nil {
-		return primitive.NilObjectID, err
+		err = errors.New(id + " is not a valid ObjectID")
 	}
 
-	return i, nil
+	return i, err
 }
