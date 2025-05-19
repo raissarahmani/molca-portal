@@ -1,0 +1,19 @@
+---
+services:
+  mongo:
+    image: mongo:7.0.12
+    container_name: mongo
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+      - MONGO_INITDB_DATABASE=portal-app
+    ports:
+      - '27017:27017'
+    command: mongod --bind_ip_all
+    volumes:
+      - dbdata:/data/db
+
+volumes:
+  dbdata:
