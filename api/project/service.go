@@ -6,7 +6,6 @@ import (
 	"github.com/molca-id/portal-app-api/api/project/dto"
 	"github.com/molca-id/portal-app-api/api/project/model"
 
-	// coredto "github.com/molca-id/portal-app-api/arch/dto"
 	"github.com/molca-id/portal-app-api/arch/mongo"
 	"github.com/molca-id/portal-app-api/arch/network"
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -17,7 +16,6 @@ type Service interface {
 	SaveProject(d *dto.CreateProject) (*model.Project, error)
 	GetProjectById(id bson.ObjectID) (*model.Project, error)
 	GetProjectBySlug(slug string) (*model.Project, error)
-	// FindPaginatedProjects(p *coredto.Pagination) ([]*model.Project, error)
 	UpdateProject(id bson.ObjectID, d *dto.UpdateProject) error
 	GetProjectSlugExists(slug string) bool
 	DeleteProject(id bson.ObjectID) error
@@ -37,7 +35,10 @@ func NewService(db mongo.Database) Service {
 
 func (s *service) GetProjectSlugExists(slug string) bool {
 	filter := bson.M{"slug": slug}
-	projection := bson.D{{}}
+	projection := bson.D{{
+		Key:   "created_at",
+		Value: 0,
+	}}
 	opts := options.FindOne().SetProjection(projection)
 
 	_, err := s.projectQueryBuilder.SingleQuery().FindOne(filter, opts)

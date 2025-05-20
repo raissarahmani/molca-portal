@@ -17,7 +17,7 @@ func NewController(
 	service Service,
 ) network.Controller {
 	return &controller{
-		BaseController: network.NewBaseController("/projects"),
+		BaseController: network.NewBaseController("/project"),
 		service:        service,
 	}
 }
