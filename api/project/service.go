@@ -86,17 +86,6 @@ func (s *service) GetProjectBySlug(slug string) (*model.Project, error) {
 	return project, nil
 }
 
-// func (s *service) FindPaginatedProjects(p *coredto.Pagination) ([]*model.Project, error) {
-// 	filter := bson.M{}
-
-// 	project, err := s.projectQueryBuilder.SingleQuery().FindPaginated(filter, p.Page, p.Limit, nil)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return project, nil
-// }
-
 func (s *service) UpdateProject(id bson.ObjectID, d *dto.UpdateProject) error {
 	filter := bson.M{"_id": id}
 	_, err := s.projectQueryBuilder.SingleQuery().FindOne(filter, nil)
