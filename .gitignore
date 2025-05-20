@@ -25,4 +25,6 @@ storage/
 
 .env
 
+tmp/
+
 DS_Store
