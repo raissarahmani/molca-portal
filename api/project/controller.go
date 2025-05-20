@@ -25,6 +25,8 @@ func NewController(
 func (c *controller) MountRoutes(group *gin.RouterGroup) {
 	group.POST("/", c.createProjectHandler)
 	group.GET("/:id", c.getProjectByIdHandler)
+	group.PUT("/:id", c.updateProjectHandler)
+	group.DELETE("/:id", c.deleteProjectHandler)
 	group.GET("/slug/:slug", c.getProjectBySlugHandler)
 }
 
@@ -48,6 +50,27 @@ func (c *controller) createProjectHandler(ctx *gin.Context) {
 		return
 	}
 	c.Send(ctx).SuccessDataResponse("Project created successfully", data)
+}
+
+func (c *controller) updateProjectHandler(ctx *gin.Context) {
+	mongoId, err := network.ReqParams(ctx, coredto.EmptyMongoId())
+	if err != nil {
+		c.Send(ctx).BadRequestError(err.Error(), err)
+		return
+	}
+	body, err := network.ReqBody(ctx, &dto.UpdateProject{})
+	if err != nil {
+		c.Send(ctx).BadRequestError(err.Error(), err)
+		return
+	}
+
+	err = c.service.UpdateProject(mongoId.ID, body)
+	if err != nil {
+		c.Send(ctx).InternalServerError("Something went wrong", err)
+		return
+	}
+
+	c.Send(ctx).SuccessDataResponse("Project updated successfully", nil)
 }
 
 func (c *controller) getProjectByIdHandler(ctx *gin.Context) {
@@ -92,4 +115,20 @@ func (c *controller) getProjectBySlugHandler(ctx *gin.Context) {
 	}
 
 	c.Send(ctx).SuccessDataResponse("Project fetched successfully", data)
+}
+
+func (c *controller) deleteProjectHandler(ctx *gin.Context) {
+	mongoId, err := network.ReqParams(ctx, coredto.EmptyMongoId())
+	if err != nil {
+		c.Send(ctx).BadRequestError(err.Error(), err)
+		return
+	}
+
+	err = c.service.DeleteProject(mongoId.ID)
+	if err != nil {
+		c.Send(ctx).InternalServerError("Something went wrong", err)
+		return
+	}
+
+	c.Send(ctx).SuccessDataResponse("Project deleted successfully", nil)
 }
