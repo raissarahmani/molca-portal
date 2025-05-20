@@ -32,7 +32,7 @@ func create(env *config.Env) (network.Router, Module, Shutdown) {
 		Name:        env.DBName,
 		MinPoolSize: env.DBMinPoolSize,
 		MaxPoolSize: env.DBMaxPoolSize,
-		Timeout:     time.Duration(env.DBQueryTimeout) * time.Second,
+		Timeout:     time.Duration(env.DBQueryTimeout) * time.Second * 10,
 	}
 
 	db := mongo.NewDatabase(ctx, dbConfig)

@@ -17,7 +17,6 @@ type DbConfig struct {
 	Pwd         string
 	Host        string
 	Port        uint16
-	Database    string
 	Name        string
 	MinPoolSize uint16
 	MaxPoolSize uint16
@@ -81,7 +80,7 @@ func (d *database) Connect() {
 
 	fmt.Println("Connected to MongoDB")
 
-	d.Database = client.Database(d.config.Database)
+	d.Database = client.Database(d.config.Name)
 }
 
 func (d *database) Disconnect() {

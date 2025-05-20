@@ -1,0 +1,24 @@
+package middleware
+
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/molca-id/portal-app-api/arch/network"
+)
+
+type notFound struct {
+	network.BaseMiddleware
+}
+
+func NewNotFound() network.RootMiddleware {
+	return &notFound{
+		BaseMiddleware: network.NewBaseMiddleware(),
+	}
+}
+
+func (m *notFound) Attach(engine *gin.Engine) {
+	engine.NoRoute(m.Handler)
+}
+
+func (m *notFound) Handler(ctx *gin.Context) {
+	m.Send(ctx).NotFoundError("url not found", nil)
+}
