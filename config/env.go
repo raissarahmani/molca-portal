@@ -25,6 +25,12 @@ type Env struct {
 	RedisPort uint16 `mapstructure:"REDIS_PORT"`
 	RedisPwd  string `mapstructure:"REDIS_PASSWORD"`
 	RedisDB   int    `mapstructure:"REDIS_DB"`
+	// AWS
+	AWSAccessKeyID     string `mapstructure:"AWS_ACCESS_KEY_ID"`
+	AWSSecretAccessKey string `mapstructure:"AWS_SECRET_ACCESS_KEY"`
+	AWSRegion          string `mapstructure:"AWS_REGION"`
+	AWSBucketName      string `mapstructure:"AWS_BUCKET_NAME"`
+	AWSBucketURL       string `mapstructure:"AWS_BUCKET_URL"`
 	// keys
 	RSAPrivateKeyPath string `mapstructure:"RSA_PRIVATE_KEY_PATH"`
 	RSAPublicKeyPath  string `mapstructure:"RSA_PUBLIC_KEY_PATH"`

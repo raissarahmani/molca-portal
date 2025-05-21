@@ -5,8 +5,25 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 )
+
+func ReqBodyMultipart[T any](ctx *gin.Context, dto Dto[T]) (*T, error) {
+	if err := ctx.ShouldBindWith(dto, binding.FormMultipart); err != nil {
+		e := processErrors(dto, err)
+		return nil, e
+	}
+
+	v := validator.New()
+	v.RegisterTagNameFunc(CustomTagNameFunc())
+	if err := v.Struct(dto); err != nil {
+		e := processErrors(dto, err)
+		return nil, e
+	}
+
+	return dto.GetValue(), nil
+}
 
 func ReqBody[T any](ctx *gin.Context, dto Dto[T]) (*T, error) {
 	if err := ctx.ShouldBindJSON(dto); err != nil {

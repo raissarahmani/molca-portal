@@ -3,6 +3,7 @@ package startup
 import (
 	"context"
 
+	cover "github.com/molca-id/portal-app-api/api/cover"
 	project "github.com/molca-id/portal-app-api/api/project"
 	projects "github.com/molca-id/portal-app-api/api/projects"
 	coreMW "github.com/molca-id/portal-app-api/arch/middleware"
@@ -15,12 +16,10 @@ import (
 type Module network.Module[module]
 
 type module struct {
-	Context         context.Context
-	Env             *config.Env
-	DB              mongo.Database
-	Store           redis.Store
-	ProjectService  project.Service
-	ProjectsService projects.Service
+	Context context.Context
+	Env     *config.Env
+	DB      mongo.Database
+	Store   redis.Store
 }
 
 func (m *module) GetInstance() *module {
@@ -31,6 +30,7 @@ func (m *module) Controllers() []network.Controller {
 	return []network.Controller{
 		project.NewController(project.NewService(m.DB)),
 		projects.NewController(projects.NewService(m.DB)),
+		cover.NewController(cover.NewService(m.Env)),
 	}
 }
 
@@ -42,14 +42,10 @@ func (m *module) RootMiddlewares() []network.RootMiddleware {
 }
 
 func NewModule(ctx context.Context, env *config.Env, db mongo.Database, store redis.Store) Module {
-	projectService := project.NewService(db)
-	projectsService := projects.NewService(db)
 	return &module{
-		Context:         ctx,
-		Env:             env,
-		DB:              db,
-		Store:           store,
-		ProjectService:  projectService,
-		ProjectsService: projectsService,
+		Context: ctx,
+		Env:     env,
+		DB:      db,
+		Store:   store,
 	}
 }
