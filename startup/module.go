@@ -28,7 +28,7 @@ func (m *module) GetInstance() *module {
 
 func (m *module) Controllers() []network.Controller {
 	return []network.Controller{
-		project.NewController(project.NewService(m.DB)),
+		project.NewController(project.NewService(m.DB, m.Store)),
 		projects.NewController(projects.NewService(m.DB)),
 		cover.NewController(cover.NewService(m.Env)),
 	}

@@ -14,12 +14,15 @@ type InfoProject struct {
 	Link      string        `json:"link" binding:"required"`
 	ImageUrl  string        `json:"image_url" binding:"required"`
 	Type      string        `json:"type" binding:"required"`
-	CreatedAt time.Time     `json:"created_at" binding:"required"`
 	UpdatedAt time.Time     `json:"last_updated_at" binding:"required"`
 }
 
 func EmptyInfoProject() *InfoProject {
 	return &InfoProject{}
+}
+
+func (i *InfoProject) GetValue() *InfoProject {
+	return i
 }
 
 func (d *InfoProject) ValidateErrors(errs validator.ValidationErrors) ([]string, error) {

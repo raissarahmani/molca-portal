@@ -23,6 +23,10 @@ func EmptyItemProject() *ItemProject {
 	return &ItemProject{}
 }
 
+func (i *ItemProject) GetValue() *ItemProject {
+	return i
+}
+
 func NewItemProject(project *model.Project) (*ItemProject, error) {
 	return utils.MapTo[ItemProject](project)
 }

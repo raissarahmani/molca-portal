@@ -12,6 +12,10 @@ func EmptyItemImage() *ItemImage {
 	return &ItemImage{}
 }
 
+func (i *ItemImage) GetValue() *ItemImage {
+	return i
+}
+
 func (d *ItemImage) ValidateErrors(errs validator.ValidationErrors) ([]string, error) {
 	var msgs []string
 	for _, err := range errs {
