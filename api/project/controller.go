@@ -5,24 +5,30 @@ import (
 	"github.com/molca-id/portal-app-api/api/project/dto"
 	coredto "github.com/molca-id/portal-app-api/arch/dto"
 	"github.com/molca-id/portal-app-api/arch/network"
+	"github.com/molca-id/portal-app-api/common"
 	"github.com/molca-id/portal-app-api/utils"
 )
 
 type controller struct {
 	network.BaseController
+	common.ContextPayload
 	service Service
 }
 
 func NewController(
+	authMFunc network.AuthenticationProvider,
+	authorizeMFunc network.AuthorizationProvider,
 	service Service,
 ) network.Controller {
 	return &controller{
-		BaseController: network.NewBaseController("/project"),
+		BaseController: network.NewBaseController("/project", authMFunc, authorizeMFunc),
+		ContextPayload: common.NewContextPayload(),
 		service:        service,
 	}
 }
 
 func (c *controller) MountRoutes(group *gin.RouterGroup) {
+	group.Use(c.Authentication())
 	group.POST("/", c.createProjectHandler)
 	group.GET("/:id", c.getProjectByIdHandler)
 	group.PUT("/:id", c.updateProjectHandler)

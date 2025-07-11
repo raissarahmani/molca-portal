@@ -40,8 +40,8 @@ type ResponseSender interface {
 type BaseController interface {
 	ResponseSender
 	Path() string
-	// Authentication() gin.HandlerFunc
-	// Authorization(role string) gin.HandlerFunc
+	Authentication() gin.HandlerFunc
+	Authorization(role string) gin.HandlerFunc
 }
 
 type Controller interface {
@@ -98,8 +98,8 @@ type ParamNMiddlewareProvider[T any] interface {
 	Middleware(params ...T) gin.HandlerFunc
 }
 
-// type AuthenticationProvider Param0MiddlewareProvider
-// type AuthorizationProvider ParamNMiddlewareProvider[string]
+type AuthenticationProvider Param0MiddlewareProvider
+type AuthorizationProvider ParamNMiddlewareProvider[string]
 
 type BaseRouter interface {
 	GetEngine() *gin.Engine
@@ -116,8 +116,8 @@ type Router interface {
 type BaseModule[T any] interface {
 	GetInstance() *T
 	RootMiddlewares() []RootMiddleware
-	// AuthenticationProvider() AuthenticationProvider
-	// AuthorizationProvider() AuthorizationProvider
+	AuthenticationProvider() AuthenticationProvider
+	AuthorizationProvider() AuthorizationProvider
 }
 
 type Module[T any] interface {

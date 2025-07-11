@@ -39,6 +39,8 @@ type Env struct {
 	RefreshTokenValiditySec uint64 `mapstructure:"REFRESH_TOKEN_VALIDITY_SEC"`
 	TokenIssuer             string `mapstructure:"TOKEN_ISSUER"`
 	TokenAudience           string `mapstructure:"TOKEN_AUDIENCE"`
+	// JWKs
+	JWKsURL string `mapstructure:"JWKS_URL"`
 }
 
 func NewEnv(filename string, override bool) *Env {
