@@ -39,6 +39,7 @@ func (m *module) Controllers() []network.Controller {
 
 func (m *module) RootMiddlewares() []network.RootMiddleware {
 	return []network.RootMiddleware{
+		coreMW.NewCorsMiddleware(),
 		coreMW.NewErrorCatcher(),
 		coreMW.NewNotFound(),
 	}
