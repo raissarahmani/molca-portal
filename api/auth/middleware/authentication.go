@@ -62,6 +62,7 @@ func (m *authenticationProvider) Middleware() gin.HandlerFunc {
 		authHeader := ctx.GetHeader(network.AuthorizationHeader)
 		if len(authHeader) == 0 {
 			m.Send(ctx).UnauthorizedError("permission denied: missing authorization", nil)
+			log.Printf("[DEBUG] Authorization header: %s", authHeader)
 			return
 		}
 
@@ -71,10 +72,13 @@ func (m *authenticationProvider) Middleware() gin.HandlerFunc {
 			return
 		}
 
+		log.Printf("[DEBUG] Raw token (first 50 chars): %s...", tokenString[:50])
+
 		// Parse the token
 		token, err := m.authService.VerifyToken(tokenString, jwks.Keyfunc)
 		if err != nil || !token.Valid {
 			m.Send(ctx).UnauthorizedError("permission denied: invalid authorization", nil)
+			log.Printf("[ERROR] Token verification failed: %v", err)
 			return
 		}
 
@@ -82,6 +86,7 @@ func (m *authenticationProvider) Middleware() gin.HandlerFunc {
 		claims, ok := m.authService.ValidateClaims(token)
 		if !ok {
 			m.Send(ctx).UnauthorizedError("permission denied: invalid authorization", nil)
+			log.Printf("[ERROR] Token claims invalid: %+v", token.Claims)
 			return
 		}
 
