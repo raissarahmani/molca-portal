@@ -1,6 +1,10 @@
 package auth
 
 import (
+	"errors"
+	"log"
+	"time"
+
 	"github.com/golang-jwt/jwt/v4"
 	userModel "github.com/molca-id/portal-app-api/api/user/model"
 	"github.com/molca-id/portal-app-api/arch/network"
@@ -24,25 +28,82 @@ func NewService(env *config.Env) Service {
 	}
 }
 
-func (s *service) VerifyToken(tokenString string, keyFunc jwt.Keyfunc) (*jwt.Token, error) {
-	return jwt.Parse(tokenString, keyFunc)
+type CustomClaims struct {
+	jwt.RegisteredClaims
 }
 
-func (s *service) ValidateClaims(claims *jwt.Token) (*userModel.User, bool) {
-	user, ok := claims.Claims.(jwt.MapClaims)
-	if !ok {
-		return nil, false
+const tokenLeeway = 10 * time.Second
+
+func (c *CustomClaims) Valid() error {
+	now := time.Now().UTC()
+
+	if c.ExpiresAt != nil {
+		if now.Add(-tokenLeeway).After(c.ExpiresAt.Time) {
+			return errors.New("token is expired")
+		}
 	}
 
-	userID, ok := user["sub"].(string)
-	if !ok {
-		return nil, false
+	if c.NotBefore != nil {
+		if c.NotBefore.Time.After(now.Add(tokenLeeway)) {
+			return errors.New("token not valid yet (nbf)")
+		}
 	}
 
-	userObj, err := userModel.NewUser(userID)
-	if err != nil {
-		return nil, false
+	if c.IssuedAt != nil {
+		if c.IssuedAt.Time.After(now.Add(tokenLeeway)) {
+			return errors.New("token used before issued (iat)")
+		}
 	}
 
-	return userObj, true
+	return nil
+}
+
+func (s *service) VerifyToken(tokenString string, keyFunc jwt.Keyfunc) (*jwt.Token, error) {
+	claims := &CustomClaims{}
+
+	token, err := jwt.ParseWithClaims(tokenString, claims, keyFunc)
+	if err == nil && token.Valid {
+		return token, nil
+	}
+
+	var rawClaims jwt.MapClaims
+	if _, _, perr := new(jwt.Parser).ParseUnverified(tokenString, &rawClaims); perr == nil {
+		if v, ok := rawClaims["iat"].(float64); ok {
+			log.Printf("[DEBUG] token iat: %v (UTC)", time.Unix(int64(v), 0).UTC())
+		}
+		if v, ok := rawClaims["nbf"].(float64); ok {
+			log.Printf("[DEBUG] token nbf: %v (UTC)", time.Unix(int64(v), 0).UTC())
+		}
+		if v, ok := rawClaims["exp"].(float64); ok {
+			log.Printf("[DEBUG] token exp: %v (UTC)", time.Unix(int64(v), 0).UTC())
+		}
+		log.Printf("[DEBUG] server now: %v (UTC)", time.Now().UTC())
+	}
+
+	return nil, err
+}
+
+func (s *service) ValidateClaims(token *jwt.Token) (*userModel.User, bool) {
+	if c, ok := token.Claims.(*CustomClaims); ok && c != nil {
+		if c.Subject == "" {
+			return nil, false
+		}
+		userObj, err := userModel.NewUser(c.Subject)
+		if err != nil {
+			return nil, false
+		}
+		return userObj, true
+	}
+
+	if mc, ok := token.Claims.(jwt.MapClaims); ok {
+		if sub, ok := mc["sub"].(string); ok && sub != "" {
+			userObj, err := userModel.NewUser(sub)
+			if err != nil {
+				return nil, false
+			}
+			return userObj, true
+		}
+	}
+
+	return nil, false
 }
