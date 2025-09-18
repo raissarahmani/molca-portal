@@ -41,6 +41,9 @@ type Env struct {
 	TokenAudience           string `mapstructure:"TOKEN_AUDIENCE"`
 	// JWKs
 	JWKsURL string `mapstructure:"JWKS_URL"`
+	// analytics
+	GoogleApplicationCredentials string `mapstructure:"GOOGLE_APPLICATION_CREDENTIALS"`
+	GAPropertyID                 string `mapstructure:"GA_PROPERTY_ID"`
 }
 
 func NewEnv(filename string, override bool) *Env {
